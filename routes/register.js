@@ -3,7 +3,7 @@ const router = Express.Router();
 const bcrypt = require("bcrypt");
 
 //import user model and generateKey function
-const { User, generateKey } = require("../models/UserModel");
+const { User, generateKey } = require("../models/user_model");
 
 //Register using phone number and no email firebase
 

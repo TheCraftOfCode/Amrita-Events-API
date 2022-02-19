@@ -6,7 +6,7 @@
 //mongoose schema:
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const generateKey = require('../utils/generateKey');
+const generateKey = require('../utils/generate_key');
 
 //creating the schema for the admin user with email instead of phone number
 const AdminSchema = new mongoose.Schema(

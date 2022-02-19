@@ -3,7 +3,7 @@ const app = Express();
 const register = require("./routes/register");
 const login = require("./routes/login");
 //import DatabaseConnection
-require("./config/DatabaseConnection")();
+require("./config/database_connection")();
 
 app.use(Express.json());
 

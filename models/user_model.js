@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 //require generateKey function from utils
-const generateKey = require('../utils/generateKey');
+const generateKey = require('../utils/generate_key');
 
 
 
