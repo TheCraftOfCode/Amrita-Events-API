@@ -13,6 +13,7 @@ const deleteEvents = require("./routes/delete_event");
 const rsvpEvents = require("./routes/rsvp_events");
 const getRsvpEvents = require("./routes/get_rsvp_events");
 
+//TODO: Add route to delete users as admin, delete self, password reset and get list of all users when admin
 
 require("./config/database_connection")();
 
