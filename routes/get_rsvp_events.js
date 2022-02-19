@@ -2,14 +2,15 @@
 //add all imports
 let express = require("express");
 let router = express.Router();
-const {User} = require("../models/user_model");
-const {Admin} = require("../models/admin_model");
+const { User } = require("../models/user_model");
+const { Admin } = require("../models/admin_model");
 const Events = require("../models/events_model");
 
 //route export
 module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     //get user id from request
     let id = request.user._id
+    let getEventsIDOnly = request.body.getEventsIDOnly
 
     //check if id is not empty
     console.log(id)
@@ -42,6 +43,13 @@ module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], t
                 message: "User has not RSVPed for any events"
             });
         }
+
+        if (getEventsIDOnly && getEventsIDOnly === true) {
+            return response.status(200).send({
+                message: "RSVPed events list",
+                listOfRSVPEvents: listOfRSVPEvents
+            });
+        }
         //return list of rsvp events
         // Get all events instead of ID and send events
         let events = await Events.find({
@@ -52,7 +60,8 @@ module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], t
         console.log(events)
 
         return response.status(200).send({
-            events
+            message: "Fetched RSVPed events successfully",
+            listOfRSVPEvents: events
         });
     }
     catch (e) {
