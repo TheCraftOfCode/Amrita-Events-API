@@ -25,10 +25,6 @@ const EventSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    listOfRSVPUsers: {
-        type: [String],
-        default: [],
-    },
     eventType: {
         type: String,
         required: true,

@@ -7,19 +7,19 @@ VerifyAuth = require("../middleware/verify_auth", require)
 
 router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
 
-    //get user id from request
-    let { id } = request.body;
+    //get user eventID from request
+    let { eventID } = request.body;
     let userID = request.user._id
     console.log(userID)
 
-    //check if id is not empty
-    if (!id) {
+    //check if eventID is not empty
+    if (!eventID) {
         return response.status(400).send({
-            message: "Please provide event id"
+            message: "Please provide event eventID"
         });
     }
 
-    //find event by id
+    //find event by eventID
     try {
         const CheckUser = await User.findById(userID);
         const CheckAdmin = await Admin.findById(userID);
@@ -33,7 +33,7 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
         }
         //update listOfRSVPEvents in user
         
-        if(user.listOfRSVPEvents.includes(id)){
+        if(user.listOfRSVPEvents.includes(eventID)){
             return response.status(400).send({
                 message: "User already RSVPed for this event"
             });
@@ -42,7 +42,7 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
         if (!user.listOfRSVPEvents) {
             user.listOfRSVPEvents = [];
         }
-        user.listOfRSVPEvents.push(id);
+        user.listOfRSVPEvents.push(eventID);
         user.save(
             async (err, user) => {
                 if (err) {
@@ -51,18 +51,8 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
                         error: err.message || "Something went wrong"
                     })
                 }
-                let event = await Events.findById(id);
+                let event = await Events.findById(eventID);
                 event.countOfRSVP += 1;
-                if(event.listOfRSVPUsers.includes(id)){
-                    return response.status(400).send({
-                        message: "User already RSVPed for this event"
-                    });
-                }
-                //check if listOfRSVPEvents is undefined
-                if (!event.listOfRSVPUsers) {
-                    event.listOfRSVPUsers = [];
-                }
-                event.listOfRSVPUsers.push(id);
                 event.save(
                     (err, event) => {
                         if (err) {

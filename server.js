@@ -12,7 +12,12 @@ const modifyEvents = require("./routes/modify_event");
 const deleteEvents = require("./routes/delete_event");
 const rsvpEvents = require("./routes/rsvp_events");
 const getRsvpEvents = require("./routes/get_rsvp_events");
-const deleteUser = require("./routes/delete_self");
+const deleteSelf = require("./routes/delete_self");
+const deleteAdmin = require("./routes/delete_admins");
+const deleteUser = require("./routes/delete_users");
+const getAllUsers = require("./routes/get_all_users");
+//impprt get_rsvp_users 
+const getRsvpUsers = require("./routes/get_rsvp_users");
 
 //TODO: Add route to delete users as admin, delete self, password reset and get list of all users when admin
 
@@ -37,7 +42,12 @@ app.use("/modify_event", modifyEvents);
 app.use("/delete_event", deleteEvents);
 app.use("/rsvp_events", rsvpEvents);
 app.use("/get_rsvp_events", getRsvpEvents);
-app.use("/delete_self", deleteUser);
+app.use("/delete_self", deleteSelf);
+app.use("/delete_admin", deleteAdmin);
+app.use("/delete_user", deleteUser);
+app.use("/get_all_users", getAllUsers);
+app.use("/get_rsvp_users", getRsvpUsers);
+
 
 const PORT = process.env.PORT || 8000;
 
