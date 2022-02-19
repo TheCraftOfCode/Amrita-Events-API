@@ -88,7 +88,7 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
             user.password = hash;
             //update verificationKey
             user.verificationKey = generateKey();
-            //save user and callback return message
+            //save user return message
             user.save(err => {
                 if (err) {
                     return response.status(400).json({
