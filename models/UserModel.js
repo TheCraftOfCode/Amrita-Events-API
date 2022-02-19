@@ -1,16 +1,10 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-//replace const with const
 
-function generateKey() {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < 16; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
+//require generateKey function from utils
+const generateKey = require('../utils/generateKey');
+
+
 
 const UserSchema = new mongoose.Schema(
     {
@@ -41,7 +35,7 @@ const UserSchema = new mongoose.Schema(
 )
 
 UserSchema.methods.generateAuthToken = function () {
-    return jwt.sign({_id: this._id, verificationKey: this.verificationKey}, 'mysecretkey')
+    return jwt.sign({_id: this._id, verificationKey: this.verificationKey, role: "user"}, 'mysecretkey')
 }
 
 module.exports = {
