@@ -19,18 +19,13 @@ module.exports = function (roles, allowMiddleware) {
             const userRole = request.user.role;
             const id = request.user._id
 
-            console.log(request.user)
-
             if (!userRole) {
                 return response.status(403).send("You are not authorised to perform this action");
             } else if (roles.includes(userRole)) {
-                //userId: userId,
                 const CheckUser = await User.findById(id);
                 const CheckAdmin = await Admin.findById(id);
                 let user = CheckUser || CheckAdmin;
                 
-                console.log(user, "admin user")
-
                 if (!user)
                     return response.status(412).send("User not found");
                 else {
