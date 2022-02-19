@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const { User, generateKey } = require("../models/UserModel");
 
 //Register using phone number and no email firebase
-//Firebase auth validate phone number
 
 module.exports = router.post("/", (req, res) => {
     const { name } = req.body;
@@ -62,9 +61,6 @@ module.exports = router.post("/", (req, res) => {
         });
     }
 
-
-
-    //Everyhting is valid, save to mongodb
     //bcrypt password
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);
