@@ -1,0 +1,17 @@
+{
+  "name": "amrita-events-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Amrita Events App",
+  "main": "server.js",
+  "scripts": {
+    "run": "npx nodemon start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "nodemon": "^2.0.15"
+  }
+}
