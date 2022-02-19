@@ -10,6 +10,7 @@ const addEvents = require("./routes/add_events");
 const getEvents = require("./routes/get_events");
 const modifyEvents = require("./routes/modify_event");
 const deleteEvents = require("./routes/delete_event");
+const rsvpEvents = require("./routes/rsvp_events");
 
 
 require("./config/database_connection")();
@@ -31,6 +32,7 @@ app.use("/add_events", addEvents);
 app.use("/get_events", getEvents);
 app.use("/modify_event", modifyEvents);
 app.use("/delete_event", deleteEvents);
+app.use("/rsvp_events", rsvpEvents);
 
 const PORT = process.env.PORT || 8000;
 
