@@ -2,7 +2,9 @@ const Express = require("express");
 const app = Express();
 const register = require("./routes/register");
 const login = require("./routes/login");
-//import DatabaseConnection
+const adminRegister = require("./routes/admin_register");
+const adminLogin = require("./routes/admin_login");
+const verifyToken = require("./routes/verify_token");
 require("./config/database_connection")();
 
 app.use(Express.json());
@@ -12,7 +14,10 @@ app.get("/", (request, response) => {
 });
 
 app.use("/register", register);
+app.use("/admin_register", adminRegister);
 app.use("/login", login);
+app.use("/admin_login", adminLogin);
+app.use("/verify_token", verifyToken);
 
 const PORT = process.env.PORT || 8000;
 

@@ -1,9 +1,3 @@
-//Admin user schema with roles as admin and super_admin
-// Language: javascript
-// Path: models/AdminModel.js
-// Compare this snippet from routes/register.js:
-
-//mongoose schema:
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const generateKey = require('../utils/generate_key');
@@ -27,7 +21,11 @@ const AdminSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            required: true
+            required: true,
+            enum: {
+                values: ['admin', 'super_admin'],
+                message: '{VALUE} is not a valid role'
+            }
         },
         verificationKey: {
             type: String,
