@@ -37,7 +37,7 @@ app.use("/modify_event", modifyEvents);
 app.use("/delete_event", deleteEvents);
 app.use("/rsvp_events", rsvpEvents);
 app.use("/get_rsvp_events", getRsvpEvents);
-app.use("/delete_user", deleteUser);
+app.use("/delete_self", deleteUser);
 
 const PORT = process.env.PORT || 8000;
 
