@@ -53,6 +53,16 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
                 }
                 let event = await Events.findById(id);
                 event.countOfRSVP += 1;
+                if(event.listOfRSVPUsers.includes(id)){
+                    return response.status(400).send({
+                        message: "User already RSVPed for this event"
+                    });
+                }
+                //check if listOfRSVPEvents is undefined
+                if (!event.listOfRSVPUsers) {
+                    event.listOfRSVPUsers = [];
+                }
+                event.listOfRSVPUsers.push(id);
                 event.save(
                     (err, event) => {
                         if (err) {

@@ -31,6 +31,11 @@ const AdminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        listOfRSVPEvents: {
+            type: [String],
+            default: [],
+            required: true
+        },
 
     }
 );
