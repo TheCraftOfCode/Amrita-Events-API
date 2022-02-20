@@ -16,8 +16,8 @@ const deleteSelf = require("./routes/delete_self");
 const deleteAdmin = require("./routes/delete_admins");
 const deleteUser = require("./routes/delete_users");
 const getAllUsers = require("./routes/get_all_users");
-//impprt get_rsvp_users
 const getRsvpUsers = require("./routes/get_rsvp_users");
+const changePhoneNumber = require("./routes/change_phone_number");
 
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
@@ -42,7 +42,7 @@ app.use("/login", login);
 app.use("/admin_login", adminLogin);
 app.use("/verify_token", verifyToken);
 app.use("/change_password", changePassword);
-
+app.use("/change_phone_number", changePhoneNumber);
 app.use("/add_events", addEvents);
 app.use("/get_events", getEvents);
 app.use("/modify_event", modifyEvents);

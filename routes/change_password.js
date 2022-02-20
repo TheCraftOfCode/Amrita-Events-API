@@ -97,7 +97,7 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
                 }
                 return response.status(200).json({
                     message: "Password updated successfully",
-                    user: user
+                    token: user.generateAuthToken()
                 });
             });
 
