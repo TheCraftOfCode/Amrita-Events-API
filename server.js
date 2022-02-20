@@ -16,8 +16,15 @@ const deleteSelf = require("./routes/delete_self");
 const deleteAdmin = require("./routes/delete_admins");
 const deleteUser = require("./routes/delete_users");
 const getAllUsers = require("./routes/get_all_users");
-//impprt get_rsvp_users 
+//impprt get_rsvp_users
 const getRsvpUsers = require("./routes/get_rsvp_users");
+
+let admin = require("firebase-admin");
+const serviceAccount = require("./config/key.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 //TODO: Add route to delete users as admin, delete self, password reset and get list of all users when admin
 
@@ -49,7 +56,7 @@ app.use("/get_all_users", getAllUsers);
 app.use("/get_rsvp_users", getRsvpUsers);
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
