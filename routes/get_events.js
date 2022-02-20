@@ -6,9 +6,15 @@ VerifyAuth = require("../middleware/verify_auth", require)
 router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     Events.find({}, function (err, data) {
         if (!err) {
-            return response.status(200).send(data)
+            return response.status(200).send({
+                message: "Events fetched successfully",
+                data: data
+            })
         } else {
-            return response.status(500).send(err)
+            return response.status(500).send({
+                message: "Failed to fetch events",
+                error: err
+            })
         }
     });
 })

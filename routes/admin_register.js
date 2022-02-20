@@ -30,16 +30,25 @@ function sendMailToUser(email, response, user, password) {
             if (error) {
                 console.log(error);
                 user.remove().then(r => console.log(r, "Failed to remove unused account"));
-                return response.status(500).send(error)
+                return response.status(500).send({
+                    message: "Failed to send email",
+                    error: error
+                })
             } else {
                 console.log('Email sent: ' + info.response);
-                return response.status(200).send("New admin user has been registered with the attached account")
+                return response.status(200).send({
+                    message: "Email sent successfully",
+                    info: info
+                })
             }
         });
     } catch (e) {
         console.log(e)
         user.remove().then(r => console.log(r, "Failed to remove unused account"));
-        return response.status(500).send(e)
+        return response.status(500).send({
+            message: "Failed to send email",
+            error: e
+        })
     }
 }
 

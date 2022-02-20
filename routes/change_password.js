@@ -104,7 +104,10 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
         }
     } catch (e) {
         console.log(e)
-        return response.status(400).send(e);
+        return response.status(400).send({
+            message: "Error updating password",
+            error: e
+        });
     }
 
 });
