@@ -1,7 +1,6 @@
 const Express = require("express");
 const router = Express.Router();
 const Events = require("../models/events_model");
-const moment = require("moment");
 const notification = require("../utils/notification");
 const schedule = require("node-schedule");
 VerifyAuth = require("../middleware/verify_auth")
@@ -9,7 +8,7 @@ VerifyAuth = require("../middleware/verify_auth")
 router.post("/", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
 
     //modify event data
-    let { eventName, day, month, year, timeHour, timeMinute, location, description, eventType, eventOver } = request.body;
+    let {eventName, day, month, year, timeHour, timeMinute, location, description, eventType, eventOver} = request.body;
 
     //validate eventName
     if (!eventName) {
@@ -119,12 +118,11 @@ router.post("/", VerifyAuth(["admin", "super_admin"], true), async (request, res
                 const myJob = schedule.scheduledJobs[event.id];
 
                 console.log(myJob)
-                if(myJob !== undefined) myJob.cancel()
+                if (myJob !== undefined) myJob.cancel()
 
-                schedule.scheduleJob(event.id, date, function(){
-                    console.log('The world is going to end today.');
+                schedule.scheduleJob(event.id, date, function () {
                     //TODO: Send notification from here
-                    // notification(eventName, `A new event, ${eventName} of type ${eventType} has been added!\nCheck it out for more details`, {}, "main");
+                    notification(eventName, `THe event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
 
                 });
 
@@ -136,8 +134,7 @@ router.post("/", VerifyAuth(["admin", "super_admin"], true), async (request, res
                 );
             }
         )
-    }
-    catch (e) {
+    } catch (e) {
         return response.status(400).send({
             message: "Error updating event",
             error: e.message || "Something went wrong"
