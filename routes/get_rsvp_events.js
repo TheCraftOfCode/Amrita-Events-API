@@ -5,6 +5,7 @@ let router = express.Router();
 const { User } = require("../models/user_model");
 const { Admin } = require("../models/admin_model");
 const Events = require("../models/events_model");
+VerifyAuth = require("../middleware/verify_auth")
 
 //route export
 module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
@@ -36,7 +37,7 @@ module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], t
 
         let listOfRSVPEvents = user.listOfRSVPEvents;
         console.log(listOfRSVPEvents)
-        //check if listOfRSVPEvents is undefined    
+        //check if listOfRSVPEvents is undefined
         if (!listOfRSVPEvents) {
             //return error if listOfRSVPEvents is undefined
             return response.status(400).send({

@@ -21,8 +21,8 @@ module.exports = router.post('/', verifyAuth(["super_admin"], true), (req, res) 
                 message: "Error deleting user"
             });
         }
-        console.log(user);
-        if(user.deletedCount == 1){
+        console.log(admin);
+        if(admin.deletedCount === 1){
             return res.status(200).json({
                 message: "Admin deleted successfully"
             });

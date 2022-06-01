@@ -1,5 +1,6 @@
 const Express = require("express");
 const app = Express();
+
 const register = require("./routes/register");
 const login = require("./routes/login");
 const adminRegister = require("./routes/admin_register");
@@ -18,6 +19,7 @@ const deleteUser = require("./routes/delete_users");
 const getAllUsers = require("./routes/get_all_users");
 const getRsvpUsers = require("./routes/get_rsvp_users");
 const changePhoneNumber = require("./routes/change_phone_number");
+const getNotifications = require("./routes/get_notifications");
 
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
@@ -54,6 +56,7 @@ app.use("/delete_admin", deleteAdmin);
 app.use("/delete_user", deleteUser);
 app.use("/get_all_users", getAllUsers);
 app.use("/get_rsvp_users", getRsvpUsers);
+app.use("/get_notifications", getNotifications);
 
 
 const PORT = process.env.PORT || 8001;

@@ -1,7 +1,6 @@
 const Express = require("express");
 const router = Express.Router();
 const Events = require("../models/events_model");
-const mongoose = require("mongoose");
 VerifyAuth = require("../middleware/verify_auth")
 
 router.post("/", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
