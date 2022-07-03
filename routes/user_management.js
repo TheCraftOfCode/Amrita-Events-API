@@ -1,12 +1,11 @@
 const Express = require("express");
 const router = Express.Router();
 const {UserTemporary, generateKey, User} = require("../models/user_model");
-let VerifyAuth
+let VerifyAuth = require("../middleware/verify_auth")
 const bcrypt = require("bcrypt");
 const {passwordStrength} = require('check-password-strength')
 const emailValidator = require("email-validator");
 const nodemailer = require("nodemailer");
-VerifyAuth = require("../middleware/verify_auth")
 
 function sendMailToUser(host, id, email, response, user) {
     try {
@@ -349,7 +348,7 @@ router.post("/changePassword", VerifyAuth(["admin", "super_admin", "user"], true
                 let updatedDoc = await User.findById(id);
                 return response.status(200).send({
                     message: "Password changed successfully",
-                    token: updatedDoc.GenerateJwtToken()
+                    token: updatedDoc.generateAuthToken()
                 });
 
             });

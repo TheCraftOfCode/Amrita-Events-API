@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const emailValidator = require("email-validator");
 const nodemailer = require('nodemailer');
-const verifyAuth = require("../middleware/verify_auth");
+const VerifyAuth = require("../middleware/verify_auth");
 const {generateKey, User} = require("../models/user_model");
 
 function sendMailToUser(email, response, user, password) {
@@ -50,7 +50,7 @@ function sendMailToUser(email, response, user, password) {
 }
 
 //register an account for an admin
-router.post("/register", verifyAuth(["super_admin"], true), (req, res) => {
+router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
     //get the email, name and password from the request body
     const {name} = req.body;
     const {email} = req.body;
@@ -123,7 +123,7 @@ router.post("/register", verifyAuth(["super_admin"], true), (req, res) => {
     );
 });
 
-router.post('/delete', verifyAuth(["super_admin", "admin"], true), (req, res) => {
+router.post('/delete', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
     //get the email from the request body
     const {email} = req.body;
 
@@ -177,7 +177,7 @@ router.post('/delete', verifyAuth(["super_admin", "admin"], true), (req, res) =>
 })
 
 //get list of users
-router.post('/getUsers', verifyAuth(["super_admin", "admin"], true), (req, res) => {
+router.post('/getUsers', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
 
     //get user type in body
     const {userType} = req.body;

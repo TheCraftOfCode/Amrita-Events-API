@@ -2,8 +2,7 @@ const Express = require("express");
 const router = Express.Router();
 const Events = require("../models/events_model");
 const {User} = require("../models/user_model");
-const verifyAuth = require("../middleware/verify_auth");
-VerifyAuth = require("../middleware/verify_auth", require)
+const VerifyAuth = require("../middleware/verify_auth");
 
 //RSVP for an event
 router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
@@ -145,7 +144,7 @@ router.post("/getRSVPEvents", VerifyAuth(["admin", "super_admin", "user"], true)
 })
 
 //get all users RSVPd to a particular event
-router.post('/getRSVPUsers', verifyAuth(["super_admin", "admin"], true), (req, res) => {
+router.post('/getRSVPUsers', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
     //get event id from body
     const { eventId } = req.body;
 
