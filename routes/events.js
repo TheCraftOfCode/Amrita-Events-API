@@ -231,7 +231,6 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
                 if (myJob !== undefined) myJob.cancel()
 
                 schedule.scheduleJob(event.id, date, function () {
-                    //TODO: Send notification from here
                     notification(eventName, `THe event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
 
                 });

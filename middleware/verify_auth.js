@@ -13,7 +13,6 @@ module.exports = function (roles, allowMiddleware) {
                 .send("Token not found, please attach token and try again");
         }
         try {
-            //TODO: Add JWT key instead of fixed key
             request.user = jwt.verify(receiveToken, process.env.JWT_SECRET_KEY);
             const userRole = request.user.role;
             const id = request.user._id

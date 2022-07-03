@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 //require generateKey function from utils
 const generateKey = require('../utils/generate_key');
 
-//TODO: Add a temporary schema
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,

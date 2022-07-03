@@ -1,5 +1,11 @@
 const Express = require("express");
 const app = Express();
+
+//TODO: Check gmail password, AUTH error while sending email
+//TODO: Modify mail modules to send generic mails and send mail to users for
+//TODO: Add module for forgot password
+//TODO: Test firebase notification
+
 require("dotenv").config();
 
 //Import for all routes
