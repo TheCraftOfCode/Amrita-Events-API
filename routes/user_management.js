@@ -53,13 +53,11 @@ function sendMailToUser(host, id, email, response, user) {
 }
 
 //register
-router.post("/", VerifyAuth('', false), async (request, response) => {
+router.post("/register", VerifyAuth('', false), async (request, response) => {
 
     const email = request.body.email
     const name = request.body.name
     const password = request.body.password
-    let userId = ""
-
 
     const verifyPassword = passwordStrength(password)
 
@@ -139,7 +137,7 @@ router.post("/", VerifyAuth('', false), async (request, response) => {
 })
 
 //login
-router.post("/", (req, res) => {
+router.post("/login", (req, res) => {
 
     //get the email and password from the request body
     const { email } = req.body;
@@ -284,7 +282,7 @@ router.post('/', VerifyAuth(['admin', 'super_admin', 'user'], true), async (requ
 })
 
 //change password
-router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+router.post("/changePassword", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     const id = request.user._id;
     const newPassword = request.body.newPassword;
     const currentPassword = request.body.currentPassword;
