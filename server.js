@@ -1,26 +1,13 @@
 const Express = require("express");
 const app = Express();
 
-//TODO: Remove deleted imports
-const register = require("./routes/register_delete");
-const login = require("./routes/login_deleted");
-const adminRegister = require("./routes/admin_register");
-const adminLogin = require("./routes/login");
-const verifyToken = require("./routes/verify_token");
-const changePassword = require("./routes/change_password_delete");
-const addEvents = require("./routes/add_events");
-const getEvents = require("./routes/get_events");
-const modifyEvents = require("./routes/modify_event");
-const deleteEvents = require("./routes/delete_event");
-const rsvpEvents = require("./routes/rsvp_events");
-const getRsvpEvents = require("./routes/get_rsvp_events");
-const deleteSelf = require("./routes/delete_self");
-const deleteAdmin = require("./routes/delete_admins");
-const deleteUser = require("./routes/delete_users");
-const getAllUsers = require("./routes/get_all_users");
-const getRsvpUsers = require("./routes/get_rsvp_users");
-const changePhoneNumber = require("./routes/change_phone_number_delete");
+//Import for all routes
+const adminManagement = require("./routes/admin_management")
+const eventManagement = require("./routes/events")
 const getNotifications = require("./routes/get_notifications");
+const rsvp = require("./routes/rsvp")
+const userManagement = require("./routes/user_management")
+const verifyToken = require("./routes/verify_token");
 
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
@@ -28,8 +15,6 @@ const serviceAccount = require("./config/key.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
-
-//TODO: Add route to delete users as admin, delete self, password reset and get list of all users when admin
 
 require("./config/database_connection")();
 
@@ -39,27 +24,13 @@ app.get("/", (request, response) => {
     response.status(200).send("Welcome to Amrita Events API");
 });
 
-//TODO: Reconfigure all routes
-app.use("/register", register);
-app.use("/admin_register", adminRegister);
-app.use("/login", login);
-app.use("/admin_login", adminLogin);
-app.use("/verify_token", verifyToken);
-app.use("/change_password", changePassword);
-app.use("/change_phone_number", changePhoneNumber);
-app.use("/add_events", addEvents);
-app.use("/get_events", getEvents);
-app.use("/modify_event", modifyEvents);
-app.use("/delete_event", deleteEvents);
-app.use("/rsvp_events", rsvpEvents);
-app.use("/get_rsvp_events", getRsvpEvents);
-app.use("/delete_self", deleteSelf);
-app.use("/delete_admin", deleteAdmin);
-app.use("/delete_user", deleteUser);
-app.use("/get_all_users", getAllUsers);
-app.use("/get_rsvp_users", getRsvpUsers);
-app.use("/get_notifications", getNotifications);
-
+//Routes used
+app.use("/admin", adminManagement)
+app.use("/event", eventManagement)
+app.use("/notification", getNotifications)
+app.use("/rsvp", rsvp)
+app.use("/user", userManagement)
+app.use("/verifyToken", verifyToken)
 
 const PORT = process.env.PORT || 8001;
 
