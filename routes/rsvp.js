@@ -81,7 +81,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
 })
 
 //get all rsvp'd events by a user
-module.exports = router.post("/getRSVPEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+router.post("/getRSVPEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     //get user id from request
     let id = request.user._id
     let getEventsIDOnly = request.body.getEventsIDOnly

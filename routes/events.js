@@ -101,7 +101,7 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
             notification(eventName, `A new event, ${eventName} of type ${eventType} has been added!\nCheck it out for more details`, {}, "main");
 
             console.log(date.toString(), event.date.toString())
-            schedule.scheduleJob(event.id, date, function(){
+            schedule.scheduleJob(event.id, date, function () {
                 notification(eventName, `The event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
             });
 
@@ -296,8 +296,7 @@ router.post("/deleteEvent", VerifyAuth(["admin", "super_admin"], true), async (r
                 }
             )
         }
-    }
-    catch (e) {
+    } catch (e) {
         return response.status(400).send({
             message: "Error updating event",
             error: e.message || "Something went wrong"
