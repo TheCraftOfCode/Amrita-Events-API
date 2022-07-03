@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const VerifyAuth = require("../middleware/verify_auth");
 const {generateKey, User} = require("../models/user_model");
 
-function sendMailToUser(email, response, user, password) {
+function sendCreationMail(email, response, user, password) {
     try {
 
         //change credentials to different account
@@ -26,7 +26,7 @@ function sendMailToUser(email, response, user, password) {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
-                user.remove().then(r => console.log(r, "Failed to remove unused account"));
+                user.remove().then(r => console.log(r, "Removed unused account"));
                 return response.status(500).send({
                     message: "Failed to send email",
                     error: error
@@ -41,7 +41,7 @@ function sendMailToUser(email, response, user, password) {
         });
     } catch (e) {
         console.log(e)
-        user.remove().then(r => console.log(r, "Failed to remove unused account"));
+        user.remove().then(r => console.log(r, "Removed unused account"));
         return response.status(500).send({
             message: "Failed to send email",
             error: e
@@ -98,7 +98,7 @@ router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
                 admin.save()
                     .then(result => {
                         //send the generated password to the user
-                        sendMailToUser(
+                        sendCreationMail(
                             email,
                             res,
                             result,

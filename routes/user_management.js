@@ -7,9 +7,9 @@ const {passwordStrength} = require('check-password-strength')
 const emailValidator = require("email-validator");
 const nodemailer = require("nodemailer");
 
-function sendMailToUser(host, id, email, response, user) {
+function sendVerificationMail(host, id, email, response, user) {
     try {
-        let link = host + "/verifyEmail?id=" + id + "&email=" + email;
+        let link = host + "/user/verifyEmail?id=" + id + "&email=" + email;
 
         const transporter = nodemailer.createTransport({
             service: 'gmail', auth: {
@@ -28,7 +28,7 @@ function sendMailToUser(host, id, email, response, user) {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
-                user.remove().then(r => console.log(r, "Failed to remove temporary instance"));
+                user.remove().then(r => console.log(r, "Removed temporary instance"));
                 return response.status(500).send({
                     message: "Failed to send verification mail",
                     error: error
@@ -43,7 +43,7 @@ function sendMailToUser(host, id, email, response, user) {
         });
     } catch (e) {
         console.log(e)
-        user.remove().then(r => console.log(r, "Failed to remove temporary instance"));
+        user.remove().then(r => console.log(r, "Removed temporary instance"));
         return response.status(500).send({
             message: "Failed to send verification mail",
             error: e
@@ -61,15 +61,6 @@ router.post("/register", VerifyAuth('', false), async (request, response) => {
     const verifyPassword = passwordStrength(password)
 
     //check
-    if (!password) {
-        return response.status(400).send({
-            message: "Password is required"
-        })
-    } else if (verifyPassword.id < 2) {
-        return response.status(400).send({
-            message: "Password is too weak"
-        })
-    }
     if (!email) {
         return response.status(400).send({
             message: "Email is required"
@@ -79,8 +70,17 @@ router.post("/register", VerifyAuth('', false), async (request, response) => {
         return response.status(400).send({
             message: "Email is not valid"
         })
-
     }
+    if (!password) {
+        return response.status(400).send({
+            message: "Password is required"
+        })
+    } else if (verifyPassword.id < 2) {
+        return response.status(400).send({
+            message: "Password is too weak"
+        })
+    }
+
 
     if (!name) {
         return response.status(400).send({
@@ -127,7 +127,7 @@ router.post("/register", VerifyAuth('', false), async (request, response) => {
 
 
     await createNewTemporaryInstance.save()
-        .then(user => sendMailToUser("https://amritotsavam-api.herokuapp.com", verificationToken, email, response, user))
+        .then(user => sendVerificationMail(process.env.HOST, verificationToken, email, response, user))
         .catch(err => {
             return response.status(500).send({
                 message: err.message || "Some error occurred while creating the User."
@@ -190,7 +190,7 @@ router.post("/login", (req, res) => {
 });
 
 //verify
-router.get('/', async function (request, response) {
+router.get('/verifyEmail', async function (request, response) {
     if (!request.query.id || !request.query.email) {
         response.send('Invalid Link')
     } else {
@@ -362,10 +362,6 @@ router.post("/changePassword", VerifyAuth(["admin", "super_admin", "user"], true
     }
 
 });
-
-//Test accounts:
-//{"email": "cb.en.u4cse19352@cb.students.amrita.edu","password": "ey1xsd82l6qrynwgna7xm"}
-//{"email": "soorya.s27@gmail.com","password": "soorya!1"}
 
 module.exports = router
 
