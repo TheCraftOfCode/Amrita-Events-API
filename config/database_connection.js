@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 module.exports = function(){
-    mongoose.connect('mongodb://localhost/amrita-events-api', { useNewUrlParser: true });
-    mongoose.connection.on('error', function(err){
-        console.log('Mongoose connection error: ' + err);
+    const DatabaseConnection = mongoose.connect(
+        process.env.DBCONN
+    );
+    DatabaseConnection.then(() => {
+        console.log("Database connection was successful!");
     });
-    mongoose.connection.on('open', function(){
-        console.log('Mongoose connected successfully');
+    DatabaseConnection.catch((error) => {
+        console.log(`Database connection refused`, error);
     });
 }

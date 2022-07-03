@@ -12,12 +12,12 @@ function sendMailToUser(email, response, user, password) {
         //change credentials to different account
         const transporter = nodemailer.createTransport({
             service: 'gmail', auth: {
-                user: "events.amritacbe@gmail.com", pass: "amritaevents2022"
+                user: process.env.EMAIL, pass: process.env.PASSWORD
             }
         });
 
         let mailOptions = {
-            from: "events.amritacbe@gmail.com",
+            from: process.env.EMAIL,
             to: email,
             subject: "Account creation for Admin Profile",
             text: "Your account has been created, use this password to login: " + password,
@@ -52,8 +52,8 @@ function sendMailToUser(email, response, user, password) {
 //register an account for an admin
 router.post("/register", verifyAuth(["super_admin"], true), (req, res) => {
     //get the email, name and password from the request body
-    const { name } = req.body;
-    const { email } = req.body;
+    const {name} = req.body;
+    const {email} = req.body;
 
     //validate name and email
     if (!name) {
@@ -111,8 +111,7 @@ router.post("/register", verifyAuth(["super_admin"], true), (req, res) => {
                             return res.status(400).json({
                                 message: "User already exists"
                             });
-                        }
-                        else{
+                        } else {
                             return res.status(500).json({
                                 message: "Internal server error",
                                 error: err.message
@@ -126,7 +125,7 @@ router.post("/register", verifyAuth(["super_admin"], true), (req, res) => {
 
 router.post('/delete', verifyAuth(["super_admin", "admin"], true), (req, res) => {
     //get the email from the request body
-    const { email } = req.body;
+    const {email} = req.body;
 
     //validate email
     if (!email) {
@@ -137,23 +136,23 @@ router.post('/delete', verifyAuth(["super_admin", "admin"], true), (req, res) =>
 
     const userToDelete = User.findOne({email: email})
 
-    if(!userToDelete){
+    if (!userToDelete) {
         return res.status(400).send({
             message: "User not found"
         })
     }
 
     //admin can only delete user
-    if(req.user.role === "admin"){
-        if(["super_admin", "admin"].includes(userToDelete.role)){
+    if (req.user.role === "admin") {
+        if (["super_admin", "admin"].includes(userToDelete.role)) {
             return res.status(400).send({
                 message: "You are attempting to delete an admin, you are not authorised to perform this action"
             })
         }
     }
     //super admin cannot delete super admin
-    else if(req.user.role === "super_admin"){
-        if(userToDelete.role === "super_admin"){
+    else if (req.user.role === "super_admin") {
+        if (userToDelete.role === "super_admin") {
             return res.status(400).send({
                 message: "You are attempting to delete a super admin, you are not authorised to perform this action"
             })
@@ -181,15 +180,15 @@ router.post('/delete', verifyAuth(["super_admin", "admin"], true), (req, res) =>
 router.post('/getUsers', verifyAuth(["super_admin", "admin"], true), (req, res) => {
 
     //get user type in body
-    const { userType } = req.body;
+    const {userType} = req.body;
 
-    if(!userType){
+    if (!userType) {
         return res.status(400).send({
             message: "Please attach user type"
         })
     }
 
-    if(!['user', 'admin', 'super_admin'].includes(userType)){
+    if (!['user', 'admin', 'super_admin'].includes(userType)) {
         return res.status(400).send({
             message: "Please attach a valid user type"
         })

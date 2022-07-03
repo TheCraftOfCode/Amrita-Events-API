@@ -1,5 +1,6 @@
 const Express = require("express");
 const app = Express();
+require("dotenv").config();
 
 //Import for all routes
 const adminManagement = require("./routes/admin_management")

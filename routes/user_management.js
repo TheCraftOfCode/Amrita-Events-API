@@ -21,7 +21,7 @@ function sendMailToUser(host, id, email, response, user) {
         let mailOptions = {
             from: process.env.EMAIL,
             to: email,
-            subject: "Amritotsavam verification mail",
+            subject: "Amrita events verification mail",
             text: "Please confirm your email by clicking on this link, this link will expire in 15 minutes",
             html: "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
         }
