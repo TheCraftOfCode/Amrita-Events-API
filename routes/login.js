@@ -1,20 +1,21 @@
-//Login route for the application
-
-//importing the required modules
+//admin login route
+//import the required modules
 const bcrypt = require('bcrypt');
 const express = require("express");
+const {User} = require("../models/user_model");
 const router = express.Router();
-const { User } = require("../models/user_model");
-
-//login route
+//import verify auth
+//add login route
 module.exports = router.post("/", (req, res) => {
-    const { phoneNumber } = req.body;
+
+    //get the email and password from the request body
+    const { email } = req.body;
     const { password } = req.body;
 
-    //check if phone number is valid
-    if (!phoneNumber) {
+    //check if email is valid
+    if (!email) {
         return res.status(400).json({
-            message: "Phone number is required"
+            message: "Email is required"
         });
     }
 
@@ -26,7 +27,7 @@ module.exports = router.post("/", (req, res) => {
     }
 
     //Check if user exists in mongoose
-    User.findOne({ phoneNumber: phoneNumber }, (err, user) => {
+    User.findOne({ email: email }, (err, user) => {
         if (err) {
             return res.status(500).json({
                 message: "Internal server error"
@@ -48,13 +49,16 @@ module.exports = router.post("/", (req, res) => {
             });
         }
 
-
-            //if everything is valid, create JWT from user schema and send back to user
-            return res.status(200).json({
-                message: "Login successful",
-                token: user.generateAuthToken()
-            });
-
+        //return JWT is success
+        return res.status(200).json({
+            message: "Login successful",
+            token: user.generateAuthToken(),
+            role: user.role
+        });
     }
     );
 });
+
+//Test accounts:
+//{"email": "cb.en.u4cse19352@cb.students.amrita.edu","password": "ey1xsd82l6qrynwgna7xm"}
+//{"email": "soorya.s27@gmail.com","password": "soorya!1"}

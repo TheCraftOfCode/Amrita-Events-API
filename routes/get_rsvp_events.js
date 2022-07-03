@@ -3,7 +3,6 @@
 let express = require("express");
 let router = express.Router();
 const { User } = require("../models/user_model");
-const { Admin } = require("../models/admin_model");
 const Events = require("../models/events_model");
 VerifyAuth = require("../middleware/verify_auth")
 
@@ -23,9 +22,7 @@ module.exports = router.post("/", VerifyAuth(["admin", "super_admin", "user"], t
 
     try {
         //get list of rsvp events from user
-        const CheckUser = await User.findById(id);
-        const CheckAdmin = await Admin.findById(id);
-        let user = CheckUser || CheckAdmin;
+        const user = await User.findById(id);
         console.log(user)
 
         //check if user is not found

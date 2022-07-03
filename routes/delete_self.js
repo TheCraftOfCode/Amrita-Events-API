@@ -3,9 +3,6 @@ const express = require('express');
 const router = express.Router();
 const VerifyAuth = require('../middleware/verify_auth');
 const { User } = require("../models/user_model");
-const { Admin } = require("../models/admin_model");
-const {getAuth} = require("firebase-admin/auth");
-
 
 module.exports = router.post('/', VerifyAuth(['admin', 'super_admin', 'user'], true), async (request, response) => {
     let id = request.user._id
@@ -20,9 +17,7 @@ module.exports = router.post('/', VerifyAuth(['admin', 'super_admin', 'user'], t
 
     try {
         //get Admin and User from ID
-        const CheckUser = await User.findById(id);
-        const CheckAdmin = await Admin.findById(id);
-        let user = CheckUser || CheckAdmin;
+        const user = await User.findById(id);
         console.log(user)
 
         //check if user is not found
@@ -31,16 +26,6 @@ module.exports = router.post('/', VerifyAuth(['admin', 'super_admin', 'user'], t
                 message: "User not found"
             });
         }
-
-        if(user.userID)
-        getAuth()
-            .deleteUser(user.userID)
-            .then(() => {
-                console.log('Successfully deleted user from firebase');
-            })
-            .catch((error) => {
-                console.log('Error deleting user:', error);
-            });
 
         //delete user and send response
         user.remove(

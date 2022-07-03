@@ -3,11 +3,11 @@
 const bcrypt = require('bcrypt');
 const express = require("express");
 const router = express.Router();
-const { Admin, generateKey } = require("../models/admin_model");
 const emailValidator = require("email-validator");
 //import node mailer
 const nodemailer = require('nodemailer');
 const verifyAuth = require("../middleware/verify_auth");
+const {generateKey, User} = require("../models/user_model");
 
 function sendMailToUser(email, response, user, password) {
     try {
@@ -90,7 +90,7 @@ module.exports = router.post("/", verifyAuth(["super_admin"], true), (req, res) 
             });
         } else {
             //create a new admin user
-            const admin = new Admin({
+            const admin = new User({
                 name,
                 email,
                 password: hash,

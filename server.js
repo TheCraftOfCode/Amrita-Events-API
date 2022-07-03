@@ -1,12 +1,13 @@
 const Express = require("express");
 const app = Express();
 
-const register = require("./routes/register");
-const login = require("./routes/login");
+//TODO: Remove deleted imports
+const register = require("./routes/register_delete");
+const login = require("./routes/login_deleted");
 const adminRegister = require("./routes/admin_register");
-const adminLogin = require("./routes/admin_login");
+const adminLogin = require("./routes/login");
 const verifyToken = require("./routes/verify_token");
-const changePassword = require("./routes/change_password");
+const changePassword = require("./routes/change_password_delete");
 const addEvents = require("./routes/add_events");
 const getEvents = require("./routes/get_events");
 const modifyEvents = require("./routes/modify_event");
@@ -18,7 +19,7 @@ const deleteAdmin = require("./routes/delete_admins");
 const deleteUser = require("./routes/delete_users");
 const getAllUsers = require("./routes/get_all_users");
 const getRsvpUsers = require("./routes/get_rsvp_users");
-const changePhoneNumber = require("./routes/change_phone_number");
+const changePhoneNumber = require("./routes/change_phone_number_delete");
 const getNotifications = require("./routes/get_notifications");
 
 let admin = require("firebase-admin");
@@ -38,6 +39,7 @@ app.get("/", (request, response) => {
     response.status(200).send("Welcome to Amrita Events API");
 });
 
+//TODO: Reconfigure all routes
 app.use("/register", register);
 app.use("/admin_register", adminRegister);
 app.use("/login", login);

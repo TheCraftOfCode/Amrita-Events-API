@@ -1,11 +1,10 @@
 const jwt = require("jsonwebtoken");
 const {User} = require("../models/user_model");
-const {Admin} = require("../models/admin_model"); 
+require("dotenv").config();
 
 module.exports = function (roles, allowMiddleware) {
     return async function (request, response, next) {
 
-        console.log("Verifying token");
         if (!allowMiddleware) return next();
 
         const receiveToken = request.header("user-auth-token");
@@ -15,17 +14,17 @@ module.exports = function (roles, allowMiddleware) {
                 .send("Token not found, please attach token and try again");
         }
         try {
-            request.user = jwt.verify(receiveToken, "mysecretkey");
+            //TODO: Add JWT key instead of fixed key
+            request.user = jwt.verify(receiveToken, process.env.JWT_SECRET_KEY);
             const userRole = request.user.role;
             const id = request.user._id
 
             if (!userRole) {
                 return response.status(403).send("You are not authorised to perform this action");
             } else if (roles.includes(userRole)) {
-                const CheckUser = await User.findById(id);
-                const CheckAdmin = await Admin.findById(id);
-                let user = CheckUser || CheckAdmin;
-                
+                //userId: userId,
+                const user = await User.findById(id);
+
                 if (!user)
                     return response.status(412).send("User not found");
                 else {

@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../models/user_model');
-const { Admin } = require('../models/admin_model');
 //auth
 const verifyAuth = require('../middleware/verify_auth');
 

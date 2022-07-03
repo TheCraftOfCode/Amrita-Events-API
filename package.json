@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "check-password-strength": "^2.0.5",
     "dotenv": "^16.0.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.2",

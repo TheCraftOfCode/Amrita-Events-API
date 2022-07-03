@@ -2,7 +2,6 @@ const Express = require("express");
 const router = Express.Router();
 const Events = require("../models/events_model");
 const {User} = require("../models/user_model");
-const {Admin} = require("../models/admin_model");
 VerifyAuth = require("../middleware/verify_auth", require)
 
 router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
@@ -21,9 +20,7 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
 
     //find event by eventID
     try {
-        const CheckUser = await User.findById(userID);
-        const CheckAdmin = await Admin.findById(userID);
-        let user = CheckUser || CheckAdmin;
+        const user = await User.findById(userID);
         console.log(user)
 
         if (!user) {

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const verifyAuth = require("../middleware/verify_auth");
+const {User} = require("../models/user_model");
 
 module.exports = router.post("/", verifyAuth(["admin", "super_admin", "user"], true), (req, res) => {
     const { _id } = req.body;
@@ -14,7 +15,6 @@ module.exports = router.post("/", verifyAuth(["admin", "super_admin", "user"], t
                     name: user.name,
                     role: user.role,
                     email: user.email,
-                    phoneNumber: user.phoneNumber,
                 }
             })
         } else {

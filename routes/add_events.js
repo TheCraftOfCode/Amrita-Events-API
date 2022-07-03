@@ -103,9 +103,7 @@ router.post("/", VerifyAuth(["admin", "super_admin"], true), async (request, res
 
             console.log(date.toString(), event.date.toString())
             schedule.scheduleJob(event.id, date, function(){
-                //TODO: Send notification from here
-                notification(eventName, `THe event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
-
+                notification(eventName, `The event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
             });
 
             return response.status(200).send({
