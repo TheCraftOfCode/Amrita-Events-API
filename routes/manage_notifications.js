@@ -2,8 +2,9 @@ const Express = require("express");
 const router = Express.Router();
 const {NotificationModel} = require("../models/notification_model");
 VerifyAuth = require("../middleware/verify_auth", require)
+const notification = require("../utils/notification")
 
-router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+router.post("/getNotifications", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     NotificationModel.find({}, function (err, data) {
         if (!err) {
             return response.status(200).send({
@@ -17,6 +18,22 @@ router.post("/", VerifyAuth(["admin", "super_admin", "user"], true), async (requ
             })
         }
     });
+})
+
+router.post("/sendNotification", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
+
+    let {title, body} = request.body
+
+    notification(title, body, {}).then(r => {
+        return response.status(200).send({"message": "Sent notification successfully"});
+    }).catch(r => {
+        return response.status(400).send({
+            "message": "Something went wrong",
+            "error": r
+        });
+    });
+
+
 })
 
 module.exports = router
