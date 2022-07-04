@@ -76,7 +76,7 @@ const UserTemporarySchema = new mongoose.Schema({
 });
 
 UserSchema.methods.generateAuthToken = function () {
-    return jwt.sign({_id: this._id, verificationKey: this.verificationKey, role: "user"}, process.env.JWT_SECRET_KEY)
+    return jwt.sign({_id: this._id, verificationKey: this.verificationKey, role: this.role}, process.env.JWT_SECRET_KEY)
 }
 
 module.exports = {

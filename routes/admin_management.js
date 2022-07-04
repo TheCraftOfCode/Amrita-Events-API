@@ -107,6 +107,7 @@ router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
                     })
                     .catch(err => {
                         //send the error message
+                        console.log(err)
                         if (err.code === 11000) {
                             return res.status(400).json({
                                 message: "User already exists"

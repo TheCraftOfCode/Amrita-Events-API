@@ -5,6 +5,7 @@ const app = Express();
 //TODO: Modify mail modules to send generic mails and send mail to users for
 //TODO: Add module for forgot password
 //TODO: Test firebase notification
+//TODO: Add new module to push notifications as an admin
 
 require("dotenv").config();
 
