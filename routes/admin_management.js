@@ -54,6 +54,19 @@ router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
     //get the email, name and password from the request body
     const {name} = req.body;
     const {email} = req.body;
+    const {userType} = req.body;
+
+    if (!userType) {
+        return res.status(400).json({
+            message: "User type is required"
+        });
+    }
+
+    if (!['user', 'admin', 'super_admin'].includes(userType)) {
+        return res.status(400).send({
+            message: "Invalid user type"
+        })
+    }
 
     //validate name and email
     if (!name) {
@@ -90,7 +103,7 @@ router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
                     name,
                     email,
                     password: hash,
-                    role: "admin",
+                    role: userType,
                     verificationKey: generateKey()
                 });
 
@@ -145,7 +158,7 @@ router.post('/delete', VerifyAuth(["super_admin", "admin"], true), async (req, r
         })
     }
 
-    if(userToDelete.id === req.user._id){
+    if (userToDelete.id === req.user._id) {
         return res.status(400).send({
             message: "You cannot delete yourself"
         })
