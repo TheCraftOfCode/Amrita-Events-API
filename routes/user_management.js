@@ -233,7 +233,7 @@ router.get('/verifyEmail', async function (request, response) {
 })
 
 //delete account
-router.post('/', VerifyAuth(['admin', 'super_admin', 'user'], true), async (request, response) => {
+router.post('/delete', VerifyAuth(['admin', 'super_admin', 'user'], true), async (request, response) => {
     let id = request.user._id
 
     //check if id is not empty
