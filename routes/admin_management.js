@@ -124,9 +124,11 @@ router.post("/register", VerifyAuth(["super_admin"], true), (req, res) => {
     );
 });
 
-router.post('/delete', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
+router.post('/delete', VerifyAuth(["super_admin", "admin"], true), async (req, res) => {
     //get the email from the request body
     const {email} = req.body;
+
+    console.log(email)
 
     //validate email
     if (!email) {
@@ -135,11 +137,17 @@ router.post('/delete', VerifyAuth(["super_admin", "admin"], true), (req, res) =>
         });
     }
 
-    const userToDelete = User.findOne({email: email})
+    const userToDelete = await User.findOne({email: email})
 
     if (!userToDelete) {
         return res.status(400).send({
             message: "User not found"
+        })
+    }
+
+    if(userToDelete.id === req.user._id){
+        return res.status(400).send({
+            message: "You cannot delete yourself"
         })
     }
 
@@ -153,6 +161,7 @@ router.post('/delete', VerifyAuth(["super_admin", "admin"], true), (req, res) =>
     }
     //super admin cannot delete super admin
     else if (req.user.role === "super_admin") {
+        console.log("current user is a a super admin")
         if (userToDelete.role === "super_admin") {
             return res.status(400).send({
                 message: "You are attempting to delete a super admin, you are not authorised to perform this action"
@@ -180,22 +189,8 @@ router.post('/delete', VerifyAuth(["super_admin", "admin"], true), (req, res) =>
 //get list of users
 router.post('/getUsers', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
 
-    //get user type in body
-    const {userType} = req.body;
 
-    if (!userType) {
-        return res.status(400).send({
-            message: "Please attach user type"
-        })
-    }
-
-    if (!['user', 'admin', 'super_admin'].includes(userType)) {
-        return res.status(400).send({
-            message: "Please attach a valid user type"
-        })
-    }
-
-    User.find({role: userType}, (err, users) => {
+    User.find({}).select("-_id -__v -password -verificationKey").exec((err, users) => {
         if (err) {
             return res.status(500).json({
                 message: "Error getting users"
@@ -204,11 +199,11 @@ router.post('/getUsers', VerifyAuth(["super_admin", "admin"], true), (req, res) 
 
         if (!users) {
             return res.status(404).json({
-                message: `Users of type ${userType} not found`
+                message: `Users not found`
             });
         }
         return res.status(200).json({
-            message: `Users of type ${userType} fetched successfully`,
+            message: `Users fetched successfully`,
             users: users
         });
     });
