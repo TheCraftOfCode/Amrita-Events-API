@@ -283,6 +283,7 @@ router.post('/delete', VerifyAuth(['admin', 'super_admin', 'user'], true), async
 //change password
 router.post("/changePassword", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     const id = request.user._id;
+    console.log(id)
     const newPassword = request.body.newPassword;
     const currentPassword = request.body.currentPassword;
 
@@ -361,6 +362,35 @@ router.post("/changePassword", VerifyAuth(["admin", "super_admin", "user"], true
         });
     }
 
+});
+
+router.post("/verifyToken", VerifyAuth(["admin", "super_admin", "user"], true), async (request, res) => {
+    const id = request.user._id;
+    User.findById(id, function (err, user) {
+        if (!err) {
+            //send the user data
+            if(user)
+            return res.status(200).send({
+                message: "Token is valid",
+                data: {
+                    name: user.name,
+                    role: user.role,
+                    email: user.email,
+                }
+            })
+            else{
+                return res.status(400).send({
+                    message: "User not found",
+                })
+            }
+
+        } else {
+            return res.status(500).send({
+                message: "Failed to fetch user",
+                error: err
+            })
+        }
+    });
 });
 
 module.exports = router

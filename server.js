@@ -14,7 +14,6 @@ const eventManagement = require("./routes/events")
 const getNotifications = require("./routes/get_notifications");
 const rsvp = require("./routes/rsvp")
 const userManagement = require("./routes/user_management")
-const verifyToken = require("./routes/verify_token");
 
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
@@ -37,7 +36,6 @@ app.use("/event", eventManagement)
 app.use("/notification", getNotifications)
 app.use("/rsvp", rsvp)
 app.use("/user", userManagement)
-app.use("/verifyToken", verifyToken)
 
 const PORT = process.env.PORT || 8000;
 
