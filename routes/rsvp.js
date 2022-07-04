@@ -8,12 +8,12 @@ const VerifyAuth = require("../middleware/verify_auth");
 router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
 
     //get user eventID from request
-    let { eventID } = request.body;
+    let { eventId } = request.body;
     let userID = request.user._id
     console.log(userID)
 
     //check if eventID is not empty
-    if (!eventID) {
+    if (!eventId) {
         return response.status(400).send({
             message: "Please provide event eventID"
         });
@@ -31,7 +31,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
         }
         //update listOfRSVPEvents in user
 
-        if(user.listOfRSVPEvents.includes(eventID)){
+        if(user.listOfRSVPEvents.includes(eventId)){
             return response.status(400).send({
                 message: "User already RSVPed for this event"
             });
@@ -40,7 +40,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
         if (!user.listOfRSVPEvents) {
             user.listOfRSVPEvents = [];
         }
-        user.listOfRSVPEvents.push(eventID);
+        user.listOfRSVPEvents.push(eventId);
         user.save(
             async (err, user) => {
                 if (err) {
@@ -49,7 +49,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
                         error: err.message || "Something went wrong"
                     })
                 }
-                let event = await Events.findById(eventID);
+                let event = await Events.findById(eventId);
                 event.countOfRSVP += 1;
                 event.save(
                     (err, event) => {
@@ -158,7 +158,7 @@ router.post('/getRSVPUsers', VerifyAuth(["super_admin", "admin"], true), (req, r
     //get all users who rsvpd to the event
     User.find({
         listOfRSVPEvents: eventId
-    }, (err, users) => {
+    }).select("-_id -password -listOfRSVPEvents -verificationKey -role -__v").exec((err, users) => {
         if (err) {
             return res.status(500).json({
                 message: "Error getting users"

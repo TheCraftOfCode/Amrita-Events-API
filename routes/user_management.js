@@ -36,8 +36,7 @@ function sendVerificationMail(host, id, email, response, user) {
             } else {
                 console.log('Email sent: ' + info.response);
                 return response.status(200).send({
-                    message: "Verification mail sent",
-                    user: user
+                    message: "Verification mail sent"
                 })
             }
         });
