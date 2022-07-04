@@ -267,7 +267,7 @@ router.post('/delete', VerifyAuth(['admin', 'super_admin', 'user'], true), async
                 }
                 return response.status(200).send({
                     message: "User deleted successfully",
-                    user: user
+                    userId: id
                 })
             }
         )

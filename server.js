@@ -11,7 +11,7 @@ require("dotenv").config();
 //Import for all routes
 const adminManagement = require("./routes/admin_management")
 const eventManagement = require("./routes/events")
-const getNotifications = require("./routes/get_notifications");
+const getNotifications = require("./routes/manage_notifications");
 const rsvp = require("./routes/rsvp")
 const userManagement = require("./routes/user_management")
 
