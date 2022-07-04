@@ -24,8 +24,21 @@ router.post("/sendNotification", VerifyAuth(["admin", "super_admin"], true), asy
 
     let {title, body} = request.body
 
-    notification(title, body, {}).then(r => {
+    if(!title){
+        return response.status(400).send({
+            message: "Please attach title of notification"
+        })
+    }
+
+    if(!body){
+        return response.status(400).send({
+            message: "Please attach body of notification"
+        })
+    }
+
+    notification(title, body, {}, "main").then(r => {
         return response.status(200).send({"message": "Sent notification successfully"});
+
     }).catch(r => {
         return response.status(400).send({
             "message": "Something went wrong",
