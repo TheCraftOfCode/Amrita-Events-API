@@ -4,6 +4,7 @@ VerifyAuth = require("../middleware/verify_auth")
 const Events = require("../models/events_model");
 const schedule = require('node-schedule');
 const notification = require("../utils/notification")
+const {User} = require("../models/user_model");
 
 //Add event
 router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
@@ -255,12 +256,13 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
 
 //get event
 router.post("/getEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+    let user = await User.findById(request.user._id)
     Events.find({}).lean().exec(function (err, data) {
-        console.log(data)
         data.forEach(function (event) {
             let eventDate = event.date
             event.date = eventDate.toLocaleDateString();
             event.time = eventDate.toLocaleTimeString();
+            event.rsvp = user.listOfRSVPEvents.includes(event._id)
         })
         if (!err) {
             return response.status(200).send({

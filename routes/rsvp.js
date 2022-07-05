@@ -8,7 +8,7 @@ const VerifyAuth = require("../middleware/verify_auth");
 router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
 
     //get user eventID from request
-    let { eventId } = request.body;
+    let {eventId} = request.body;
     let userID = request.user._id
     console.log(userID)
 
@@ -31,7 +31,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
         }
         //update listOfRSVPEvents in user
 
-        if(user.listOfRSVPEvents.includes(eventId)){
+        if (user.listOfRSVPEvents.includes(eventId)) {
             return response.status(400).send({
                 message: "User already RSVPed for this event"
             });
@@ -69,8 +69,7 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
             }
         );
 
-    }
-    catch (e) {
+    } catch (e) {
         return response.status(400).send({
             message: "Error updating event",
             error: e.message || "Something went wrong"
@@ -79,102 +78,36 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
 
 })
 
-//get all rsvp'd events by a user
-router.post("/getRSVPEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
-    //get user id from request
-    let id = request.user._id
-    let getEventsIDOnly = request.body.getEventsIDOnly
-
-    //check if id is not empty
-    console.log(id)
-    if (!id) {
-        return response.status(400).send({
-            message: "Please provide user id"
-        });
-    }
-
-    try {
-        //get list of rsvp events from user
-        const user = await User.findById(id);
-        console.log(user)
-
-        //check if user is not found
-        if (!user) {
-            return response.status(400).send({
-                message: "User not found"
-            });
-        }
-
-        let listOfRSVPEvents = user.listOfRSVPEvents;
-        console.log(listOfRSVPEvents)
-        //check if listOfRSVPEvents is undefined
-        if (!listOfRSVPEvents) {
-            //return error if listOfRSVPEvents is undefined
-            return response.status(400).send({
-                message: "User has not RSVPed for any events"
-            });
-        }
-
-        if (getEventsIDOnly && getEventsIDOnly === true) {
-            return response.status(200).send({
-                message: "RSVPed events list",
-                listOfRSVPEvents: listOfRSVPEvents
-            });
-        }
-        //return list of rsvp events
-        // Get all events instead of ID and send events
-        let events = await Events.find({
-            _id: {
-                $in: listOfRSVPEvents
-            }
-        });
-        console.log(events)
-
-        return response.status(200).send({
-            message: "Fetched RSVPed events successfully",
-            listOfRSVPEvents: events
-        });
-    }
-    catch (e) {
-        return response.status(400).send({
-            message: "Error getting rsvp events",
-            error: e.message || "Something went wrong"
-        })
-    }
-})
-
 //get all users RSVPd to a particular event
-router.post('/getRSVPUsers', VerifyAuth(["super_admin", "admin"], true), (req, res) => {
-    //get event id from body
-    const { eventId } = req.body;
+router.post('/getRSVP', VerifyAuth(["super_admin", "admin"], true), async (req, res) => {
 
-    //validate event id
-    if (!eventId) {
-        return res.status(400).json({
-            message: "Event id is required"
-        });
-    }
+    const users = await User.find({}).lean().select("-_id -password -verificationKey -role -__v")
 
-    //get all users who rsvpd to the event
-    User.find({
-        listOfRSVPEvents: eventId
-    }).select("-_id -password -listOfRSVPEvents -verificationKey -role -__v").exec((err, users) => {
-        if (err) {
-            return res.status(500).json({
-                message: "Error getting users"
-            });
-        }
+    Events.find({}).select("").lean().exec(async (err, event) => {
 
-        if (!users) {
-            return res.status(404).json({
-                message: "Users not found"
-            });
-        }
+        event.forEach(function (eventData) {
+            eventData.users = []
+            let eventDate = eventData.date
+            eventData.date = eventDate.toLocaleDateString();
+            eventData.time = eventDate.toLocaleTimeString();
+            users.forEach(function (userData) {
+                //get all users RSVPd to this particular event from users
+                console.log(eventData, eventData._id, userData.listOfRSVPEvents)
+                console.log(userData.listOfRSVPEvents.includes(eventData._id.toString()))
+                if(userData.listOfRSVPEvents.includes(eventData._id.toString())){
+                    eventData.users.push(userData)
+                }
+
+            })
+
+
+        })
 
         return res.status(200).json({
             message: "Users fetched successfully",
-            users: users
+            event: event
         });
-    });
+    })
+
 });
 module.exports = router
