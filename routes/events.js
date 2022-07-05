@@ -10,7 +10,19 @@ const {User} = require("../models/user_model");
 router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
 
     //get eventName date time location description countOfRSVP eventType
-    let {eventName, day, month, year, timeHour, timeMinute, host, posterUrl, location, description, eventType} = request.body;
+    let {
+        eventName,
+        day,
+        month,
+        year,
+        timeHour,
+        timeMinute,
+        host,
+        posterUrl,
+        location,
+        description,
+        eventType
+    } = request.body;
 
 
     //validate eventName
@@ -59,19 +71,17 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         });
     }
 
-    if(!host){
+    if (!host) {
         return response.status(400).send({
             message: "Please provide host of this event"
         });
     }
 
-    if(!posterUrl){
+    if (!posterUrl) {
         return response.status(400).send({
             message: "Please provide poster url"
         });
-    }
-
-    else {
+    } else {
         try {
             new URL(posterUrl);
         } catch (error) {
@@ -109,6 +119,8 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         eventName: eventName,
         date: date,
         location: location,
+        posterUrl: posterUrl,
+        host: host,
         description: description,
         eventType: eventType,
     });
@@ -117,7 +129,8 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         function (err, event) {
             if (err) {
                 return response.status(400).send({
-                    message: "Error saving event"
+                    message: "Error saving event",
+                    err: err
                 });
             }
             notification(eventName, `A new event, ${eventName} of type ${eventType} has been added!\nCheck it out for more details`, {}, "main");
@@ -140,7 +153,20 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
 router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
 
     //modify event data
-    let {eventName, day, month, year, timeHour, timeMinute, host, posterUrl, location, description, eventType, eventOver} = request.body;
+    let {
+        eventName,
+        day,
+        month,
+        year,
+        timeHour,
+        timeMinute,
+        host,
+        posterUrl,
+        location,
+        description,
+        eventType,
+        eventOver
+    } = request.body;
 
     //validate eventName
     if (!eventName) {
@@ -189,19 +215,17 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         });
     }
 
-    if(!host){
+    if (!host) {
         return response.status(400).send({
             message: "Please provide host of this event"
         });
     }
 
-    if(!posterUrl){
+    if (!posterUrl) {
         return response.status(400).send({
             message: "Please provide poster url"
         });
-    }
-
-    else {
+    } else {
         try {
             new URL(posterUrl);
         } catch (error) {
@@ -259,6 +283,8 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         event.description = description;
         event.eventType = eventType;
         event.eventOver = eventOver;
+        event.posterUrl = posterUrl;
+        event.host = host;
 
         await event.save(
             (err, event) => {
