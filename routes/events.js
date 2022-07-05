@@ -260,6 +260,7 @@ router.post("/getEvents", VerifyAuth(["admin", "super_admin", "user"], true), as
     Events.find({}).lean().exec(function (err, data) {
         data.forEach(function (event) {
             let eventDate = event.date
+            event.dateUnparsed = eventDate
             event.date = eventDate.toLocaleDateString();
             event.time = eventDate.toLocaleTimeString();
             event.rsvp = user.listOfRSVPEvents.includes(event._id)

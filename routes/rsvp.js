@@ -88,6 +88,7 @@ router.post('/getRSVP', VerifyAuth(["super_admin", "admin"], true), async (req, 
         event.forEach(function (eventData) {
             eventData.users = []
             let eventDate = eventData.date
+            event.dateUnparsed = eventDate
             eventData.date = eventDate.toLocaleDateString();
             eventData.time = eventDate.toLocaleTimeString();
             users.forEach(function (userData) {

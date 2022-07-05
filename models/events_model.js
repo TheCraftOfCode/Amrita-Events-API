@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+//TODO: Add poster url and host
 const EventSchema = new mongoose.Schema({
     eventName: {
         type: String,
