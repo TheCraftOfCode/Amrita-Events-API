@@ -10,7 +10,7 @@ const {User} = require("../models/user_model");
 router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
 
     //get eventName date time location description countOfRSVP eventType
-    let {eventName, day, month, year, timeHour, timeMinute, location, description, eventType} = request.body;
+    let {eventName, day, month, year, timeHour, timeMinute, host, posterUrl, location, description, eventType} = request.body;
 
 
     //validate eventName
@@ -39,7 +39,6 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         });
     }
 
-
     //validate time
     if (!timeHour) {
         return response.status(400).send({
@@ -58,6 +57,28 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         return response.status(400).send({
             message: "Please provide location of event"
         });
+    }
+
+    if(!host){
+        return response.status(400).send({
+            message: "Please provide host of this event"
+        });
+    }
+
+    if(!posterUrl){
+        return response.status(400).send({
+            message: "Please provide poster url"
+        });
+    }
+
+    else {
+        try {
+            new URL(posterUrl);
+        } catch (error) {
+            return response.status(400).send({
+                message: "Registration link is not valid"
+            });
+        }
     }
 
     //validate description
@@ -119,7 +140,7 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
 router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
 
     //modify event data
-    let {eventName, day, month, year, timeHour, timeMinute, location, description, eventType, eventOver} = request.body;
+    let {eventName, day, month, year, timeHour, timeMinute, host, posterUrl, location, description, eventType, eventOver} = request.body;
 
     //validate eventName
     if (!eventName) {
@@ -166,6 +187,28 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         return response.status(400).send({
             message: "Please provide location of event"
         });
+    }
+
+    if(!host){
+        return response.status(400).send({
+            message: "Please provide host of this event"
+        });
+    }
+
+    if(!posterUrl){
+        return response.status(400).send({
+            message: "Please provide poster url"
+        });
+    }
+
+    else {
+        try {
+            new URL(posterUrl);
+        } catch (error) {
+            return response.status(400).send({
+                message: "Registration link is not valid"
+            });
+        }
     }
 
     //validate description

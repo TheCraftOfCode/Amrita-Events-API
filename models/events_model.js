@@ -18,6 +18,14 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    host: {
+        type: String,
+        required: true,
+    },
+    posterUrl: {
+        type: String,
+        required: true,
+    },
     countOfRSVP: {
         type: Number,
         default: 0,
