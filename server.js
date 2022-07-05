@@ -1,13 +1,13 @@
-const Express = require("express");
-const app = Express();
+const express = require("express");
+const app = express();
+const morgan = require('morgan')
+require("dotenv").config();
 
 //TODO: Check gmail password, AUTH error while sending email
 //TODO: Modify mail modules to send generic mails and send mail to users for
 //TODO: Add module for forgot password
 //TODO: Test firebase notification
 //TODO: Add new module to push notifications as an admin
-
-require("dotenv").config();
 
 //Import for all routes
 const adminManagement = require("./routes/admin_management")
@@ -16,6 +16,7 @@ const getNotifications = require("./routes/manage_notifications");
 const rsvp = require("./routes/rsvp")
 const userManagement = require("./routes/user_management")
 
+//firebase configuration
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
 
@@ -23,9 +24,13 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
+//database setup
 require("./config/database_connection")();
 
-app.use(Express.json());
+//middlewares
+app.use(express.json())
+app.use(express.urlencoded({extended: true}));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 
 app.get("/", (request, response) => {
     response.status(200).send("Welcome to Amrita Events API");

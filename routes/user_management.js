@@ -182,7 +182,10 @@ router.post("/login", (req, res) => {
             return res.status(200).json({
                 message: "Login successful",
                 token: user.generateAuthToken(),
-                role: user.role
+                name: user.name,
+                role: user.role,
+                dateRegistered: user.dateRegistered,
+                email: user.email
             });
         }
     );
