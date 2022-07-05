@@ -255,7 +255,13 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
 
 //get event
 router.post("/getEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
-    Events.find({}, function (err, data) {
+    Events.find({}).lean().exec(function (err, data) {
+        console.log(data)
+        data.forEach(function (event) {
+            let eventDate = event.date
+            event.date = eventDate.toLocaleDateString();
+            event.time = eventDate.toLocaleTimeString();
+        })
         if (!err) {
             return response.status(200).send({
                 message: "Events fetched successfully",
