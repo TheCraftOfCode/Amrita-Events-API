@@ -3,6 +3,7 @@ const router = Express.Router();
 const Events = require("../models/events_model");
 const {User} = require("../models/user_model");
 const VerifyAuth = require("../middleware/verify_auth");
+const mongoose = require("mongoose");
 
 //RSVP for an event
 router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
@@ -50,7 +51,11 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
                     })
                 }
                 let event = await Events.findById(eventId);
+                if(!event) return response.status(400).send({
+                    message: "Event not found"
+                })
                 event.countOfRSVP += 1;
+                event.listOfRSVPUsers.push(mongoose.Types.ObjectId(userID));
                 event.save(
                     (err, event) => {
                         if (err) {
@@ -81,27 +86,13 @@ router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (
 //get all users RSVPd to a particular event
 router.post('/getRSVP', VerifyAuth(["super_admin", "admin"], true), async (req, res) => {
 
-    const users = await User.find({}).lean().select("-_id -password -verificationKey -role -__v")
-
-    Events.find({}).select("").lean().exec(async (err, event) => {
+    Events.find({}).populate("listOfRSVPUsers", 'email name role -_id').select("").lean().exec(async (err, event) => {
 
         event.forEach(function (eventData) {
-            eventData.users = []
             let eventDate = eventData.date
             event.dateUnparsed = eventDate
             eventData.date = eventDate.toLocaleDateString();
             eventData.time = eventDate.toLocaleTimeString();
-            users.forEach(function (userData) {
-                //get all users RSVPd to this particular event from users
-                console.log(eventData, eventData._id, userData.listOfRSVPEvents)
-                console.log(userData.listOfRSVPEvents.includes(eventData._id.toString()))
-                if(userData.listOfRSVPEvents.includes(eventData._id.toString())){
-                    eventData.users.push(userData)
-                }
-
-            })
-
-
         })
 
         return res.status(200).json({
@@ -111,4 +102,13 @@ router.post('/getRSVP', VerifyAuth(["super_admin", "admin"], true), async (req, 
     })
 
 });
+
+router.post('/getRSVPdCSV', VerifyAuth(["super_admin", "admin"], true), async (req, res) => {
+
+    //TODO: Build CSV
+    Events.find({}).populate("listOfRSVPUsers", 'email name role -_id')
+        .then(p => res.status(200).send(p))
+        .catch(error => console.log(error));
+})
+
 module.exports = router

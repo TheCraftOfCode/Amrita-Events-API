@@ -29,7 +29,15 @@ const EventSchema = new mongoose.Schema({
     countOfRSVP: {
         type: Number,
         default: 0,
+        required: true
     },
+    listOfRSVPUsers: [
+        {
+            type: mongoose.Types.ObjectId,
+            require: true,
+            ref: "User"
+        }
+    ],
     eventType: {
         type: String,
         required: true,
