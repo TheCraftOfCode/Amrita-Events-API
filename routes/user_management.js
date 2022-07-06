@@ -50,6 +50,84 @@ function sendVerificationMail(host, id, email, response, user) {
     }
 }
 
+function sendConfirmation(email, response, subject, text) {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', auth: {
+                user: process.env.EMAIL, pass: process.env.PASSWORD
+            }
+        });
+
+        let mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: subject,
+            text: text
+
+        }
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                return response.status(500).send({
+                    message: "Failed to send confirmation mail",
+                    error: error
+                })
+            } else {
+                console.log('Email sent: ' + info.response);
+                return response.status(200).send({
+                    message: "Confirmation mail sent successfully"
+                })
+            }
+        });
+    } catch (e) {
+        console.log(e)
+        return response.status(500).send({
+            message: "Failed to send confirmation mail",
+            error: e
+        })
+    }
+}
+
+function sendPasswordCode(email, code, response) {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', auth: {
+                user: process.env.EMAIL, pass: process.env.PASSWORD
+            }
+        });
+
+        let mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: "Password change code",
+            text: "To change your password, use this code in the forgot password section: " + code
+
+        }
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                return response.status(500).send({
+                    message: "Failed to send confirmation mail",
+                    error: error
+                })
+            } else {
+                console.log('Email sent: ' + info.response);
+                return response.status(200).send({
+                    message: "Conformation mail sent successfully"
+                })
+            }
+        });
+    } catch (e) {
+        console.log(e)
+        return response.status(500).send({
+            message: "Failed to send confirmation mail",
+            error: e
+        })
+    }
+}
+
 //register
 router.post("/register", VerifyAuth('', false), async (request, response) => {
 
@@ -138,8 +216,8 @@ router.post("/register", VerifyAuth('', false), async (request, response) => {
 router.post("/login", (req, res) => {
 
     //get the email and password from the request body
-    const { email } = req.body;
-    const { password } = req.body;
+    const {email} = req.body;
+    const {password} = req.body;
 
     //check if email is valid
     if (!email) {
@@ -156,7 +234,7 @@ router.post("/login", (req, res) => {
     }
 
     //Check if user exists in mongoose
-    User.findOne({ email: email }, (err, user) => {
+    User.findOne({email: email}, (err, user) => {
             if (err) {
                 return res.status(500).json({
                     message: "Internal server error"
@@ -273,8 +351,7 @@ router.post('/delete', VerifyAuth(['admin', 'super_admin', 'user'], true), async
                 })
             }
         )
-    }
-    catch (e) {
+    } catch (e) {
         return response.status(400).send({
             message: "Error deleting user",
             error: e.message || "Something went wrong"
@@ -371,16 +448,16 @@ router.post("/verifyToken", VerifyAuth(["admin", "super_admin", "user"], true), 
     User.findById(id, function (err, user) {
         if (!err) {
             //send the user data
-            if(user)
-            return res.status(200).send({
-                message: "Token is valid",
-                data: {
-                    name: user.name,
-                    role: user.role,
-                    email: user.email,
-                }
-            })
-            else{
+            if (user)
+                return res.status(200).send({
+                    message: "Token is valid",
+                    data: {
+                        name: user.name,
+                        role: user.role,
+                        email: user.email,
+                    }
+                })
+            else {
                 return res.status(400).send({
                     message: "User not found",
                 })
@@ -394,6 +471,157 @@ router.post("/verifyToken", VerifyAuth(["admin", "super_admin", "user"], true), 
         }
     });
 });
+
+
+router.post("/forgotPassword", async (request, response) => {
+
+    const email = request.body.email
+
+    if (!email) {
+        return response.status(400).send({
+            message: "Email is required"
+        });
+
+    } else if (!emailValidator.validate(email)) {
+        return response.status(400).send({
+            message: "Email is invalid"
+        });
+    }
+
+    const checkExistingUser = await User.findOne({
+        email: email,
+    });
+
+    if (!checkExistingUser)
+        return response.status(400)
+            .send({
+                message: "User with this email does not exist"
+            });
+
+    let verificationKey = generateKey()
+    checkExistingUser.forgotPasswordCode = verificationKey
+
+    await checkExistingUser.save()
+        .then(user => sendPasswordCode(email, verificationKey, response))
+        .catch(err => {
+            return response.status(400).send({
+                message: "Failed to send confirmation mail",
+                error: err
+            })
+        })
+
+
+})
+
+
+router.post("/forgotPasswordVerify", async (request, response) => {
+
+    const email = request.body.email
+    const password = request.body.password
+    const forgotPasswordCode = request.body.forgotPasswordCode
+
+    //get userdata using email
+    const user = await User.findOne({email: email});
+
+    //return if user not found
+    if (!user) {
+        return response.status(404).send({
+            message: "User not found"
+        })
+    }
+
+    if (!email) {
+        return response.status(400).send({
+            message: "Email is required"
+        });
+
+    } else if (!emailValidator.validate(email)) {
+        return response.status(400).send({
+            message: "Email is invalid"
+        });
+    }
+
+    if (!forgotPasswordCode) {
+        return response.status(400).send({
+            message: "Forgot password code is required"
+        });
+    }
+
+    const verifyPassword = passwordStrength(password)
+
+    if (!password) {
+        return response.status(400).send({
+            message: "Password is required"
+        });
+
+    } else if (verifyPassword.id < 2) {
+        return response.status(400).send({
+            message: "Password is weak"
+        });
+    }
+
+    const checkExistingUser = await User.findOne({
+        email: email,
+    });
+
+    if (checkExistingUser.forgotPasswordCode !== forgotPasswordCode)
+        return response.status(400).send({
+            message: "Forgot password code is invalid"
+        });
+
+    const newPasswordCheck = await bcrypt.compare(
+        password,
+        user.password
+    );
+
+    //if new password is same as old password return error
+    if (newPasswordCheck) {
+        return response.status(400).send({
+            message: "New password is same as old password"
+        });
+    }
+
+    if (!checkExistingUser)
+        return response.status(400)
+            .send({
+                message: "User does not exist"
+            });
+
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    checkExistingUser.updateOne({
+        password: hashedPassword,
+        verificationKey: generateKey(),
+        forgotPasswordCode: ""
+    }, async function (err, raw) {
+        if (err) {
+            response.send({
+                message: "Failed to change password",
+                error: err
+            });
+        }
+        const updatedDoc = await User.findOne({
+            email: email,
+        });
+        return response.status(200).send({
+            message: "Password changed successfully",
+            token: updatedDoc.generateAuthToken()
+        });
+
+    });
+
+    await checkExistingUser.save()
+        .then(user => sendConfirmation(email, response, "Password Reset", "Your password has been reset successfully, login with the new password"))
+        .catch(err => {
+            return response.status(500).send({
+                message: err.message || "Some error occurred while changing the password"
+            })
+        })
+
+
+})
+
 
 module.exports = router
 
