@@ -4,6 +4,7 @@ const Events = require("../models/events_model");
 const {User} = require("../models/user_model");
 const VerifyAuth = require("../middleware/verify_auth");
 const mongoose = require("mongoose");
+const ObjectsToCsv = require('objects-to-csv')
 
 //RSVP for an event
 router.post("/rsvp", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
@@ -105,9 +106,39 @@ router.post('/getRSVP', VerifyAuth(["super_admin", "admin"], true), async (req, 
 
 router.post('/getRSVPdCSV', VerifyAuth(["super_admin", "admin"], true), async (req, res) => {
 
-    //TODO: Build CSV
-    Events.find({}).populate("listOfRSVPUsers", 'email name role -_id')
-        .then(p => res.status(200).send(p))
+
+    const eventId = req.body.eventId
+
+    if (!eventId) {
+        return res.status(400).send({
+            message: "Please add event Id"
+        })
+    }
+
+    Events.findById(eventId).select("-__v -posterUrl -description -eventOver").lean().populate("listOfRSVPUsers", 'email name role -_id')
+        .then(async function (p) {
+            //parse data
+            const csvData = []
+            const users = p.listOfRSVPUsers
+            users.forEach(function (data) {
+                let rowData = {
+                    EventID: p._id,
+                    eventName: p.eventName,
+                    location: p.location,
+                    host: p.host,
+                    eventType: p.eventType,
+                    countOfRSVPUsers: p.countOfRSVP,
+                    email: data.email,
+                    name: data.name,
+                    role: data.role
+
+                }
+                csvData.push(rowData)
+            })
+            const csv = new ObjectsToCsv(csvData)
+            await csv.toDisk('./list.csv')
+            res.download('./list.csv', `${p.eventName.replace(/\s/g, '')}.csv`)
+        })
         .catch(error => console.log(error));
 })
 
