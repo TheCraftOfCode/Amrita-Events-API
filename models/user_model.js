@@ -43,6 +43,16 @@ const UserSchema = new mongoose.Schema({
         default: [],
         required: true
     },
+    listOfStarredEvents: {
+        type: [String],
+        default: [],
+        required: true
+    },
+    countOfStarredEvent: {
+        type: Number,
+        default: 0,
+        required: true
+    },
 });
 
 const UserTemporarySchema = new mongoose.Schema({

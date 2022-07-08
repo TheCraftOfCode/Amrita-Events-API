@@ -326,13 +326,15 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
 //get event
 router.post("/getEvents", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
     let user = await User.findById(request.user._id)
-    Events.find({}).lean().exec(function (err, data) {
+    Events.find({}).select("-listOfRSVPUsers -countOfRSVP -__v").lean().exec(function (err, data) {
         data.forEach(function (event) {
             let eventDate = event.date
             event.dateUnparsed = eventDate
             event.date = eventDate.toLocaleDateString();
             event.time = eventDate.toLocaleTimeString();
             event.rsvp = user.listOfRSVPEvents.includes(event._id)
+            event.starred = user.listOfStarredEvents.includes(event._id)
+
         })
         if (!err) {
             return response.status(200).send({
@@ -346,6 +348,129 @@ router.post("/getEvents", VerifyAuth(["admin", "super_admin", "user"], true), as
             })
         }
     });
+})
+
+router.post("/starEvent", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+    //get user eventID from request
+    let {eventId} = request.body;
+    let userID = request.user._id
+
+    //check if eventID is not empty
+    if (!eventId) {
+        return response.status(400).send({
+            message: "Please provide event eventID"
+        });
+    }
+
+    //find event by eventID
+    try {
+        const user = await User.findById(userID);
+
+        if (!user) {
+            return response.status(400).send({
+                message: "User not found"
+            });
+        }
+        //update listOfRSVPEvents in user
+
+        if (user.listOfStarredEvents.includes(eventId)) {
+            return response.status(400).send({
+                message: "User already starred this event"
+            });
+        }
+        //check if listOfRSVPEvents is undefined
+        if (!user.listOfStarredEvents) {
+            user.listOfStarredEvents = [];
+        }
+        if (!user.countOfStarredEvent) {
+            user.countOfStarredEvent = 0
+        }
+        user.countOfStarredEvent += 1
+        user.listOfStarredEvents.push(eventId);
+        user.save(
+            async (err, _) => {
+                if (err) {
+                    return response.status(400).send({
+                        message: "Error updating starred events",
+                        error: err.message || "Something went wrong"
+                    })
+                }
+                return response.status(200).send({
+                    message: "Starred event added to server",
+                });
+            }
+        );
+
+    } catch (e) {
+        return response.status(400).send({
+            message: "Error updating event",
+            error: e.message || "Something went wrong"
+        })
+    }
+})
+
+router.post("/removeStarredEvent", VerifyAuth(["admin", "super_admin", "user"], true), async (request, response) => {
+    //get user eventID from request
+    let {eventId} = request.body;
+    let userID = request.user._id
+
+    //check if eventID is not empty
+    if (!eventId) {
+        return response.status(400).send({
+            message: "Please provide event eventID"
+        });
+    }
+
+    //find event by eventID
+    try {
+        const user = await User.findById(userID);
+
+        if (!user) {
+            return response.status(400).send({
+                message: "User not found"
+            });
+        }
+        //update listOfRSVPEvents in user
+
+        if (!user.listOfStarredEvents.includes(eventId)) {
+            return response.status(400).send({
+                message: "Event has not been starred"
+            });
+        }
+        //check if listOfRSVPEvents is undefined
+        if (!user.listOfStarredEvents) {
+            user.listOfStarredEvents = [];
+        }
+        if (!user.countOfStarredEvent) {
+            user.countOfStarredEvent = 0
+        } else {
+            user.countOfStarredEvent -= 1
+        }
+        user.listOfStarredEvents = user.listOfStarredEvents.filter(function (value, index, arr) {
+            return value !== eventId;
+        });
+        console.log(user.listOfStarredEvents)
+
+        user.save(
+            async (err, _) => {
+                if (err) {
+                    return response.status(400).send({
+                        message: "Error updating starred events",
+                        error: err.message || "Something went wrong"
+                    })
+                }
+                return response.status(200).send({
+                    message: "Starred event removed from server",
+                });
+            }
+        );
+
+    } catch (e) {
+        return response.status(400).send({
+            message: "Error updating event",
+            error: e.message || "Something went wrong"
+        })
+    }
 })
 
 //delete event
