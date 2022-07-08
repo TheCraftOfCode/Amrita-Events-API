@@ -77,16 +77,12 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         });
     }
 
-    if (!posterUrl) {
-        return response.status(400).send({
-            message: "Please provide poster url"
-        });
-    } else {
+    if(posterUrl){
         try {
             new URL(posterUrl);
         } catch (error) {
             return response.status(400).send({
-                message: "Registration link is not valid"
+                message: "Poster url is not valid"
             });
         }
     }
@@ -221,16 +217,12 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         });
     }
 
-    if (!posterUrl) {
-        return response.status(400).send({
-            message: "Please provide poster url"
-        });
-    } else {
+    if(posterUrl){
         try {
             new URL(posterUrl);
         } catch (error) {
             return response.status(400).send({
-                message: "Registration link is not valid"
+                message: "Poster url is not valid"
             });
         }
     }
