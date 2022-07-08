@@ -77,7 +77,7 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
         });
     }
 
-    if(posterUrl){
+    if (posterUrl) {
         try {
             new URL(posterUrl);
         } catch (error) {
@@ -217,7 +217,7 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         });
     }
 
-    if(posterUrl){
+    if (posterUrl) {
         try {
             new URL(posterUrl);
         } catch (error) {
@@ -497,6 +497,52 @@ router.post("/deleteEvent", VerifyAuth(["admin", "super_admin"], true), async (r
         })
     }
 
+})
+
+router.post("/pageViewed", VerifyAuth(["user", "admin", "super_admin"], true), async (request, response) => {
+
+    //countOfEventViewed
+
+    try {
+        let id = request.body.id
+
+        const event = await Events.findById(id);
+
+        if (event) {
+
+            if (!event.countOfEventViewed) {
+                event.countOfEventViewed = 1
+            } else {
+                event.countOfEventViewed += 1
+            }
+
+            event.save(
+                async (err, _) => {
+                    if (err) {
+                        return response.status(400).send({
+                            message: "Error updating events",
+                            error: err.message || "Something went wrong"
+                        })
+                    }
+                    return response.status(200).send({
+                        message: "Incremented visit count",
+                    });
+                }
+            );
+
+        } else {
+            return response.status(400).send(
+                {
+                    message: "Event not found"
+                }
+            )
+        }
+    } catch (e) {
+        return response.status(400).send({
+            message: "Error updating event",
+            error: e.message || "Something went wrong"
+        })
+    }
 })
 
 module.exports = router

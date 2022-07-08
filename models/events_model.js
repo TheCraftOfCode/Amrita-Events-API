@@ -30,6 +30,11 @@ const EventSchema = new mongoose.Schema({
         default: 0,
         required: true
     },
+    countOfEventViewed: {
+        type: Number,
+        default: 0,
+        required: true
+    },
     listOfRSVPUsers: [
         {
             type: mongoose.Types.ObjectId,
