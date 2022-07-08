@@ -5,6 +5,7 @@ const Events = require("../models/events_model");
 const schedule = require('node-schedule');
 const notification = require("../utils/notification")
 const {User} = require("../models/user_model");
+const {broadcast} = require("../config/websocket");
 
 //Add event
 router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (request, response) => {
@@ -109,7 +110,6 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
     }
 
     let date = new Date(year, month, day, timeHour, timeMinute, 0);
-    console.log(date.toString(), "FINAL DATE")
     //save event to database
     const event = new Events({
         eventName: eventName,
@@ -129,9 +129,22 @@ router.post("/addEvent", VerifyAuth(["admin", "super_admin"], true), async (requ
                     err: err
                 });
             }
+
+            const eventObject = event.toObject();
+            let eventDate = eventObject.date
+            eventObject.dateUnparsed = eventDate
+            eventObject.date = eventDate.toLocaleDateString();
+            eventObject.time = eventDate.toLocaleTimeString();
+            eventObject.rsvp = false
+            eventObject.starred = false
+            broadcast(JSON.stringify({
+                message: `A new event of name ${eventName} has been added`,
+                type: "event_add",
+                data: eventObject
+            }))
+
             notification(eventName, `A new event, ${eventName} of type ${eventType} has been added!\nCheck it out for more details`, {}, "main");
 
-            console.log(date.toString(), event.date.toString())
             schedule.scheduleJob(event.id, date, function () {
                 notification(eventName, `The event, ${eventName} of type ${eventType} has been started!\nCheck it out for more details`, {}, event.id);
             });
@@ -242,7 +255,6 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
     }
 
     //validate eventOver
-    console.log(eventOver);
     if (!eventOver && eventOver !== false) {
         return response.status(400).send({
             message: "Please provide event over"
@@ -285,11 +297,22 @@ router.post("/modifyEvent", VerifyAuth(["admin", "super_admin"], true), async (r
                         message: err.message || "Some error occurred while updating the event."
                     });
                 }
+                const eventObject = event.toObject();
+                let eventDate = eventObject.date
+                eventObject.dateUnparsed = eventDate
+                eventObject.date = eventDate.toLocaleDateString();
+                eventObject.time = eventDate.toLocaleTimeString();
+                eventObject.rsvp = false
+                eventObject.starred = false
+                broadcast(JSON.stringify({
+                    message: `An event of name ${eventName} has been modified`,
+                    type: "event_modify",
+                    data: eventObject
+                }))
                 notification(eventName, `Event, ${eventName} of type ${eventType} has been modified!\nCheck it out for more details`, {}, "main");
 
                 const myJob = schedule.scheduledJobs[event.id];
 
-                console.log(myJob)
                 if (myJob !== undefined) myJob.cancel()
 
                 schedule.scheduleJob(event.id, date, function () {
@@ -441,7 +464,6 @@ router.post("/removeStarredEvent", VerifyAuth(["admin", "super_admin", "user"], 
         user.listOfStarredEvents = user.listOfStarredEvents.filter(function (value, index, arr) {
             return value !== eventId;
         });
-        console.log(user.listOfStarredEvents)
 
         user.save(
             async (err, _) => {
@@ -475,7 +497,11 @@ router.post("/deleteEvent", VerifyAuth(["admin", "super_admin"], true), async (r
 
         if (event) {
             event.remove().then(r => {
-                console.log(r)
+                broadcast(JSON.stringify({
+                    message: `An event of name ${event.eventName} has been deleted`,
+                    type: "event_delete",
+                    data: event
+                }))
                 return response.status(200).send(
                     {
                         message: "Event deleted successfully"

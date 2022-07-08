@@ -1,5 +1,7 @@
 const express = require("express");
+const http = require("http");
 const app = express();
+const server = http.createServer(app);
 const morgan = require('morgan')
 require("dotenv").config();
 
@@ -19,6 +21,7 @@ const userManagement = require("./routes/user_management")
 //firebase configuration
 let admin = require("firebase-admin");
 const serviceAccount = require("./config/key.json");
+const {socket, getWSS} = require("./config/websocket");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -26,11 +29,13 @@ admin.initializeApp({
 
 //database setup
 require("./config/database_connection")();
+socket(server)
 
 //middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
+
 
 app.get("/", (request, response) => {
     response.status(200).send("Welcome to Amrita Events API");
@@ -45,6 +50,10 @@ app.use("/user", userManagement)
 
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+//websocket config
+
+

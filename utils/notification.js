@@ -1,11 +1,17 @@
 const admin = require("firebase-admin");
 const {NotificationModel} = require("../models/notification_model")
+const {broadcast} = require("../config/websocket");
 
 module.exports = function (title, body, data, topic) {
     let notification = new NotificationModel({
         title: title,
         body: body,
     })
+    broadcast(JSON.stringify({
+        message: `A notification was pushed`,
+        type: "notification",
+        data: notification
+    }))
     notification.save();
     return admin.messaging().send({
         notification: {
