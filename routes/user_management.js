@@ -622,6 +622,35 @@ router.post("/forgotPasswordVerify", async (request, response) => {
 
 })
 
+router.post("/userStats", VerifyAuth(["admin", "super_admin", "user"], true), (req, res) => {
+    const id = req.user._id;
+    console.log(id)
+    User.findById(id, function (err, user) {
+        if (!err) {
+            //send the user data
+            if (user){
+                return res.status(200).send({
+                    message: "Stats found",
+                    rsvp: user.listOfRSVPEvents.length,
+                    starred: user.countOfStarredEvent
+                })
+            }
+
+            else {
+                return res.status(400).send({
+                    message: "User not found",
+                })
+            }
+
+        } else {
+            return res.status(500).send({
+                message: "Failed to fetch user",
+                error: err
+            })
+        }
+    });
+})
+
 
 module.exports = router
 
